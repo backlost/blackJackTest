@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
+ <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="msapplication-tap-highlight" content="no" />
+   
 <head>
     <meta charset="UTF-8">
     <title>21点</title>
@@ -56,14 +61,14 @@ a {
 </style>
 
 <body>
-    <div style="display: none;" class="container">
+    <div  class="container">
         <input class="username" type="text">
         <a class="login">登陆</a>
     </div>
     <div style="display: none;" class="waiting">
         等待中........
     </div>
-    <div class="playground">
+    <div style="display: none;" class="playground">
         <div class="anotherplayer">您的对手<span class="highlight-font"></span><span class="another-state"></span>已经开始游戏</div>
         <div class="self">
             <div class="my-card-list">您的牌堆还没牌，快要牌吧</div>
@@ -77,24 +82,23 @@ a {
 <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script>
-var _playerA ,_playerB;
-
+var _playerA ,_playerB,_userid;
 var socket = io();
 $(".login").on("click", function(e) {
     e.preventDefault();
-    var _userid = $(".username").val();
+    _userid =$(".username").val();
     _playerA=_userid;
-    socket.emit("login", _userid);
+    socket.emit("login");
     $(".container").hide();
     $(".waiting").show();
 });
 $(".getCard").on("click", function(e) {
-    socket.emit("getCard", _userid);
+    e.preventDefault();
+    socket.emit("getcard");
 });
-socket.on('newCard', function(eventDate) {
-    $(".container").hide();
-    $(".waiting").hide();
-    $(".playground").show();
+$(".finishGame").on("click",function(e){
+    e.preventDefault();
+    socket.emit("getscore");
 })
 socket.on('start', function(players) {
     for(var _ind in players){
@@ -107,39 +111,52 @@ socket.on('start', function(players) {
     $(".waiting").hide();
     $(".playground").show();
 })
+socket.on('over', function(players) {
+    $(".container").show();
+    $(".waiting").hide();
+    $(".playground").hide();
+});
+socket.on("sumscore",function(sum){
+    $(".control-pan").html("<p>您的得分为"+sum+"</p>");
+})
 
-
-socket.emit("newcard",function(_card){
+socket.on("newcard",function(_card){
     var _color = _card.substr(0,1);
 
     switch(_color){
-        case:"F":
+        case "F":
             _color="方块";
             break;
-        case:"H":
+        case "H":
             _color="红桃";
             break;
-        case:"B":
+        case "B":
             _color="黑桃";
             break;
-        case:"M":
+        case "M":
             _color="梅花";
             break;
 
     }
-    var _num = parseInt(card.substr(1)).toString();
+    var _num = parseInt(_card.substr(1)).toString();
     switch(_num){
-        case:11:
+        case 11:
             _num="J";
             break;
-        case:"12":
+        case "12":
             _num="Q";
             break;
-        case:"13":
+        case "13":
             _num="K";
             break;
     }
-    $(".my-card-list").append("<span>"+_color+_num+"</span>");
+    if(!$(".my-card-list").data("start")){
+        $(".my-card-list").html("<span>"+_color+_num+"</span>");
+        $(".my-card-list").data("start",true);
+    }else{
+         $(".my-card-list").append("<span>/"+_color+_num+"</span>");
+    }
+    
 })
 </script>
 

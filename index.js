@@ -48,14 +48,14 @@ io.on('connection', function(socket){
 
 	
 	socket.on('getcard', function(){
-
+		console.log("["+socket.id+"]"+"请求发牌");
 		var _JokerLength = JOKER_ARR.length;
 		//这里应该给error
 		if(_JokerLength==0){
 			return;
 		}
 		var _index = Math.floor(Math.random()*_JokerLength);
-		var _Joker = JOKER_ARR.index(_index);
+		var _Joker = JOKER_ARR[_index];
 		JOKER_ARR.splice(_index, 1);
 
 		if(!!resultList[socket.id]){
@@ -63,7 +63,7 @@ io.on('connection', function(socket){
 		}else{
 			resultList[socket.id]=[_Joker];
 		}
-
+		console.log("回复"+"["+socket.id+"]"+_Joker);
 		socket.emit("newcard",_Joker);
 	});
 
