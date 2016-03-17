@@ -7,7 +7,7 @@ var io = require('socket.io')(http);
 var JOKER_ARR = ["H01","H02","H03","H04","H05","H06","H07","H08","H09","H10","H11","H12","H13",
 "B01","B02","B03","B04","B05","B06","B07","B08","B09","B10","B11","B12","B13",
 "F01","F02","F03","F04","F05","F06","F07","F08","F09","F10","F11","F12","F13",
-"M01","M02","M03","M04","M05","M06","M07","M08","M09","M10","M11","M12","M13","SJOKER","BJOKER"];
+"M01","M02","M03","M04","M05","M06","M07","M08","M09","M10","M11","M12","M13"];
 
 app.get('/', function(req, res){
   res.sendfile('index.html');
@@ -64,10 +64,10 @@ io.on('connection', function(socket){
 			resultList[socket.id]=[_Joker];
 		}
 
-		socket.emit("newCard",_Joker);
+		socket.emit("newcard",_Joker);
 	});
 
-	socket.on('getScore', function(){
+	socket.on('getscore', function(){
 		var _JokerList = resultList[socket.id];
 		var _sum =0;
 		for(var _in in _JokerList){
@@ -77,7 +77,7 @@ io.on('connection', function(socket){
 			}
 			_sum +=number;
 		}
-		socket.emit("newCard",_sum);
+		socket.emit("sumscore",_sum);
 		
 	});
 
@@ -96,6 +96,10 @@ io.on('connection', function(socket){
 		// 	io.emit('logout', {onlineUsers:onlineUsers, onlineCount:onlineCount, user:obj});
 		// 	console.log(obj.username+'退出了聊天室');
 		// }
+		io.emit("over");
+		waitUsers=[];
+		playingUsers=[];
+		resultList={};
 		console.log("disconnect");
 	});
 })

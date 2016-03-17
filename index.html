@@ -51,7 +51,7 @@ a {
     height: 100%;
 }
 .highlight-font{
-	color: red;
+    color: red;
 }
 </style>
 
@@ -97,15 +97,49 @@ socket.on('newCard', function(eventDate) {
     $(".playground").show();
 })
 socket.on('start', function(players) {
-	for(var _ind in players){
-		if(players[_ind].username!=_playerA){
-			_playerB = players[_ind].username;
-		}
-	}
-	$('.highlight-font').text(_playerB);
+    for(var _ind in players){
+        if(players[_ind].username!=_playerA){
+            _playerB = players[_ind].username;
+        }
+    }
+    $('.highlight-font').text(_playerB);
     $(".container").hide();
     $(".waiting").hide();
     $(".playground").show();
+})
+
+
+socket.emit("newcard",function(_card){
+    var _color = _card.substr(0,1);
+
+    switch(_color){
+        case:"F":
+            _color="方块";
+            break;
+        case:"H":
+            _color="红桃";
+            break;
+        case:"B":
+            _color="黑桃";
+            break;
+        case:"M":
+            _color="梅花";
+            break;
+
+    }
+    var _num = parseInt(card.substr(1)).toString();
+    switch(_num){
+        case:11:
+            _num="J";
+            break;
+        case:"12":
+            _num="Q";
+            break;
+        case:"13":
+            _num="K";
+            break;
+    }
+    $(".my-card-list").append("<span>"+_color+_num+"</span>");
 })
 </script>
 
